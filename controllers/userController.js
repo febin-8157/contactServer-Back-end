@@ -1,5 +1,5 @@
 const users=require('../modals/userModal')
-
+const jwt =require('jsonwebtoken')
 // register/logic
 exports.registerController= async(req,res)=>{
     console.log("register controller");
@@ -23,4 +23,32 @@ exports.registerController= async(req,res)=>{
     }catch(err){ 
         res.status(401).json(err)
     }
+}
+
+// login
+exports.loginController= async(req,res)=>{
+console.log("inside login controller");
+const{email,password}=req.body
+console.log(email,password);
+try{
+  const existinguser=await users.findOne({email,password})
+
+  console.log(existinguser);
+  if(existinguser){
+      const token=jwt.sign({userId:existinguser._id},process.env.JWT_PASSWORD)
+
+    res.status(200).json(
+      {user:existinguser,token}
+      
+    )
+
+  }else{
+    
+    res.status(404).json("invalid email/ password!!")
+
+  }
+}
+catch(err){
+res.status(401).json(err)
+}
 }
